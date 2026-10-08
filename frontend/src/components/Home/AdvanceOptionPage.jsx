@@ -12,7 +12,7 @@ import {
     CheckCircle,
     Send
 } from 'lucide-react';
-import Navbar from '../comman/Navbar';
+import PageLayout from "../comman/PageLayout.jsx";
 import { toggleTheme } from '../../redux/slices/themeSlice.js';
 
 export default function AdvanceOptionPage() {
@@ -77,8 +77,7 @@ export default function AdvanceOptionPage() {
 
     return (
         <>
-            <Navbar />
-            <div className="min-h-screen transition-colors duration-200 bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+        <PageLayout>
                 <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
 
                     {/* Header */}
@@ -272,7 +271,7 @@ export default function AdvanceOptionPage() {
 
                     </div>
                 </main>
-            </div>
+        </PageLayout>      
         </>
     );
 }

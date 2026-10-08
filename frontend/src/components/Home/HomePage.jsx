@@ -1,4 +1,4 @@
-import Navbar from "../comman/Navbar";
+import PageLayout from "../comman/PageLayout";
 import {
     FileText,
     BookOpenText,
@@ -10,6 +10,7 @@ import {
     Scale,
     ArrowUpRight
 } from 'lucide-react';
+import { useSelector } from "react-redux";
 
 const iconBackgrounds = {
     blue: {
@@ -85,35 +86,32 @@ const options = [
     },
 ];
 
+
+
 export default function HomePage() {
+    const userName = useSelector((state) => state.user.firstName);
+
     return (
-        <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 selection:bg-indigo-500/30 selection:text-indigo-200 transition-colors duration-300">
-            <Navbar />
-
-            {/* Background Glow Overlay */}
-            <div className="relative isolate overflow-hidden">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -z-10 w-[1000px] h-[400px] bg-gradient-to-b from-indigo-500/10 via-purple-500/5 to-transparent blur-3xl opacity-50 pointer-events-none" />
-
+            <PageLayout>
                 <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
                     {/* Header Section */}
-                    <div className="mb-12 lg:mb-16 max-w-3xl">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-semibold tracking-wide uppercase mb-4">
-                            Workspace Tools
+                    <div className="mb-12 lg:mb-16 max-w-3xl mx-auto flex flex-col items-center text-center">
+                        <div className="flex items-baseline justify-center gap-1.5 text-3xl sm:text-4xl md:text-5xl">
+                            <span className="font-semibold text-slate-500 dark:text-slate-400">
+                                Hi,
+                            </span>
+                            <span className="font-bold text-indigo-600 dark:text-indigo-400">
+                                {userName}
+                            </span>
                         </div>
-                        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
-                            Select an Action
-                        </h1>
-                        <p className="mt-4 text-base sm:text-lg text-slate-600 dark:text-slate-400 font-normal leading-relaxed">
-                            Choose a tool to streamline your question building, study workflow, or content interaction pipeline.
-                        </p>
                     </div>
 
                     {/* Options Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-5 sm:gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
                         {options.map((option, index) => (
                             <button
                                 key={index}
-                                className="group relative flex items-start gap-5 p-6 sm:p-7 bg-white dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200 dark:border-slate-800/80 rounded-2xl text-left transition-all duration-300 hover:bg-slate-50 dark:hover:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700/80 hover:-translate-y-1 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                                className="group relative flex items-start gap-5 p-6 sm:p-7 bg-white/70 dark:bg-slate-900/50 backdrop-blur-xl border border-white/60 dark:border-slate-700/50 rounded-2xl text-left shadow-sm shadow-indigo-900/5 transition-all duration-300 hover:bg-white/90 dark:hover:bg-slate-900/80 hover:border-indigo-200 dark:hover:border-slate-600 hover:-translate-y-1 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                             >
                                 {/* Icon Container */}
                                 <div className={`flex items-center justify-center rounded-xl w-14 h-14 flex-shrink-0 border transition-all duration-300 ${option.style.bg} ${option.style.glow}`}>
@@ -138,7 +136,6 @@ export default function HomePage() {
                         ))}
                     </div>
                 </main>
-            </div>
-        </div>
+            </PageLayout>
     );
 }

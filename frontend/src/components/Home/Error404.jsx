@@ -1,11 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import PageLayout from "../comman/PageLayout";
 
 const Error404 = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-white flex flex-col items-center justify-center p-6 transition-colors duration-300">
+        <PageLayout>
             <div className="text-center max-w-lg mx-auto">
                 <h1 className="text-8xl font-bold text-indigo-600 dark:text-indigo-500">
                     404
@@ -28,7 +29,7 @@ const Error404 = () => {
                     Back to Home
                 </button>
             </div>
-        </div>
+        </PageLayout>     
     );
 };
 

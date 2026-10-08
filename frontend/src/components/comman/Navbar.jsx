@@ -11,7 +11,6 @@ function Navbar() {
     const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
     const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
-    const userName = useSelector((state) => state.user.firstName);
     const Tokens = useSelector((state) => state.subscription.tokens);
     const theme = useSelector((state) => state.theme.theme);
     const isDark = theme === "dark";
@@ -63,22 +62,14 @@ function Navbar() {
                         {/* Tokens (desktop only) */}
                         <div className="hidden md:flex items-baseline gap-1.5 text-sm">
                             <span className="font-semibold text-slate-500 dark:text-slate-400">
-                                Tokens:
+                                Tokens Left :
                             </span>
                             <span className="font-bold text-indigo-600 dark:text-indigo-400">
                                 {Tokens ?? "Loading..."}
                             </span>
                         </div>
 
-                        {/* Greeting (desktop only) */}
-                        <div className="hidden md:flex items-baseline gap-1.5 text-sm">
-                            <span className="font-semibold text-slate-500 dark:text-slate-400">
-                                Hi,
-                            </span>
-                            <span className="font-bold text-indigo-600 dark:text-indigo-400">
-                                {userName}
-                            </span>
-                        </div>
+                        
 
                         {/* Theme Toggle */}
                         <button
@@ -115,12 +106,6 @@ function Navbar() {
                 <div className="md:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 pt-3 pb-4 space-y-1 shadow-lg">
                     {/* Mobile Profile Section */}
                     <div className="pb-2 mb-2 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-1.5 px-3 text-base">
-                        <div className="flex items-center gap-1.5">
-                            <span className="font-bold text-slate-900 dark:text-white">Hi,</span>
-                            <span className="font-normal text-indigo-600 dark:text-indigo-400">
-                                {userName}
-                            </span>
-                        </div>
                         <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">
                             {Tokens ?? "..."} tokens
                         </span>

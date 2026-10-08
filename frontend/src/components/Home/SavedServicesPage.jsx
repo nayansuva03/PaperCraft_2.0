@@ -11,10 +11,10 @@ import {
     FolderOpen,
     Loader2
 } from "lucide-react";
-import Navbar from "../comman/Navbar";
+import PageLayout from "../comman/PageLayout";
 
 function SavedServices() {
-    const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+    const isLoggedIn = useSelector((state) => state.user.isRegistered);
     const navigate = useNavigate();
 
     const [pdfs, setPdfs] = useState([]);
@@ -43,7 +43,7 @@ function SavedServices() {
                 if (!response.ok) {
                     throw new Error(data.message || "Failed to fetch saved PDFs");
                 }
-
+                
                 setPdfs(data);
             } catch (error) {
                 console.error(error);
@@ -85,8 +85,7 @@ function SavedServices() {
     // Feature Locked View
     if (!isLoggedIn) {
         return (
-            <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0A0D18] text-slate-900 dark:text-white transition-colors duration-300">
-                <Navbar />
+            <PageLayout>
                 <div className="flex-1 flex items-center justify-center p-6">
                     <div className="max-w-md w-full bg-white dark:bg-[#121829] border border-slate-200 dark:border-slate-800 rounded-2xl p-8 text-center shadow-xl">
                         <div className="w-16 h-16 bg-indigo-500/10 rounded-2xl flex items-center justify-center mx-auto mb-5 border border-indigo-500/20">
@@ -97,68 +96,60 @@ function SavedServices() {
                             Please sign in to access and manage your saved services and documents.
                         </p>
                         <button
-                            onClick={() => navigate("/signIn")}
+                            onClick={() => navigate("/register")}
                             className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 rounded-xl transition duration-200"
                         >
                             Sign In
                         </button>
                     </div>
                 </div>
-            </div>
+            </PageLayout>
         );
     }
 
     // Loading View
     if (loading) {
         return (
-            <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0A0D18] text-slate-900 dark:text-white transition-colors duration-300">
-                <Navbar />
+            <PageLayout>
                 <div className="flex-1 flex flex-col items-center justify-center gap-3">
                     <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
                     <p className="text-slate-600 dark:text-slate-400 text-sm">Loading saved PDFs...</p>
                 </div>
-            </div>
+            </PageLayout>
         );
     }
 
     // Error View
     if (error) {
         return (
-            <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0A0D18] text-slate-900 dark:text-white transition-colors duration-300">
-                <Navbar />
+            <PageLayout>
                 <div className="flex-1 flex items-center justify-center p-6">
                     <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 px-6 py-4 rounded-xl max-w-md text-center">
                         <p className="font-medium">{error}</p>
                     </div>
                 </div>
-            </div>
+            </PageLayout>
         );
     }
 
     // Empty State
     if (pdfs.length === 0) {
         return (
-            <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0A0D18] text-slate-900 dark:text-white transition-colors duration-300">
-                <Navbar />
-                <div className="flex-1 flex items-center justify-center p-6">
-                    <div className="max-w-md w-full bg-white dark:bg-[#121829] border border-slate-200 dark:border-slate-800 rounded-2xl p-8 text-center shadow-xl">
-                        <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800/50 rounded-2xl flex items-center justify-center mx-auto mb-5 border border-slate-200 dark:border-slate-700/50">
-                            <FolderOpen className="w-8 h-8 text-slate-500 dark:text-slate-400" />
-                        </div>
-                        <h2 className="text-xl font-bold mb-2">No saved PDFs yet</h2>
-                        <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
-                            Generate a Max Question paper, Exam Paper, or Quiz Result and it will appear here.
-                        </p>
-                    </div>
+            <PageLayout>
+                <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800/50 rounded-2xl flex items-center justify-center mx-auto mb-5 border border-slate-200 dark:border-slate-700/50">
+                    <FolderOpen className="w-8 h-8 text-slate-500 dark:text-slate-400" />
                 </div>
-            </div>
+                <h2 className="text-xl font-bold mb-2">No saved PDFs yet</h2>
+                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                    Generate a Max Question paper, Exam Paper, or Quiz Result and it will appear here.
+                </p>
+            </PageLayout>
         );
     }
 
     // Main Grid Layout
     return (
-        <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0A0D18] text-slate-900 dark:text-white transition-colors duration-300">
-            <Navbar />
+        <PageLayout>
             <div className="flex-1 py-10 px-6 sm:px-10">
                 <div className="max-w-7xl mx-auto">
                     <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -235,7 +226,7 @@ function SavedServices() {
                     </div>
                 </div>
             </div>
-        </div>
+        </PageLayout>
     );
 }
 

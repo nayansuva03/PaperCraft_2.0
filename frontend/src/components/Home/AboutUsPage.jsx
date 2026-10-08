@@ -1,5 +1,4 @@
-import React from "react";
-import Navbar from "../comman/Navbar";
+import PageLayout from "../comman/PageLayout";
 
 function About() {
     const frontendTech = [
@@ -9,7 +8,6 @@ function About() {
         "React Router",
         "Tailwind CSS",
         "jsPDF",
-        "pdfjs-dist",
         "Axios",
         "Lucide React"
     ];
@@ -68,9 +66,7 @@ function About() {
     ];
 
     return (
-        <div className="min-h-screen bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col">
-            <Navbar />
-
+       <PageLayout>
             {/* Main Page Layout Wrapper */}
             <main className="flex-1 w-full flex justify-center items-center p-4 sm:p-8">
                 <div className="bg-white dark:bg-slate-900/90 rounded-3xl shadow-xl border border-slate-100 dark:border-slate-800 w-full max-w-5xl p-6 sm:p-10 my-4 transition-colors duration-300">
@@ -169,7 +165,7 @@ function About() {
                                 Cloud Assets & DB
                             </span>
                             <span className="font-semibold text-slate-800 dark:text-slate-200">
-                                MongoDB Atlas & Cloudinary
+                                MongoDB Compass & Cloudinary
                             </span>
                         </div>
                     </div>
@@ -215,7 +211,7 @@ function About() {
 
                 </div>
             </main>
-        </div>
+       </PageLayout>
     );
 }
 
