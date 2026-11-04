@@ -185,7 +185,6 @@ export default function Login() {
 
         if (
             !firstName ||
-            !lastName ||
             !email ||
             !password ||
             !confirmPassword
@@ -466,7 +465,7 @@ export default function Login() {
 
                                     <div className="flex flex-col gap-1.5">
                                         <label className="text-xs font-bold text-gray-700 uppercase tracking-wide">
-                                            Last Name
+                                            Last Name(optional)
                                         </label>
                                         <div className="flex items-center gap-2 px-3 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg focus-within:bg-gray-100 focus-within:border-indigo-600">
                                             <User size={18} className="text-gray-400 flex-shrink-0" />

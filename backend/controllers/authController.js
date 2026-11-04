@@ -16,14 +16,14 @@ export const signup = async (req, res) => {
   try {
     let { firstName, lastName, email, password, confirmPassword } = req.body;
 
-    if (!firstName || !lastName || !email || !password || !confirmPassword) {
+    if (!firstName || !email || !password || !confirmPassword) {
       return res.status(400).json({
         success: false,
         message: "All fields are required.",
       });
     }
     firstName = firstName.trim();
-    lastName = lastName.trim();
+    lastName = (lastName || "").trim();
     email = email.trim().toLowerCase();
     if (password !== confirmPassword) {
       return res.status(400).json({
@@ -75,14 +75,14 @@ export const resendSignupOTP = async (req, res) => {
   try {
     let { firstName, lastName, email, password, confirmPassword } = req.body;
 
-    if (!firstName || !lastName || !email || !password || !confirmPassword) {
+    if (!firstName || !email || !password || !confirmPassword) {
       return res.status(400).json({
         success: false,
         message: "All fields are required.",
       });
     }
     firstName = firstName.trim();
-    lastName = lastName.trim();
+    lastName = (lastName || "").trim();
     email = email.trim().toLowerCase();
     if (password !== confirmPassword) {
       return res.status(400).json({
@@ -176,7 +176,7 @@ export const verifySignupOTP = async (req, res) => {
     const hashedPassword = await bcrypt.hash(formData.password, 10);
     const newUser = await User.create({
       firstName: formData.firstName,
-      lastName: formData.lastName,
+      lastName: (formData.lastName || ""),
       email: formData.email,
       password: hashedPassword,
       isVerified: true,
