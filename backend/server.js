@@ -26,8 +26,6 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/subscription", subscriptionRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/subscription", subscriptionRoutes);
 app.use("/api", savedServicesRoutes);
 
 app.get("/", (req, res) => {

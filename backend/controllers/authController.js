@@ -600,12 +600,13 @@ export const refreshAccessToken = async (req, res) => {
 
     const newAccessToken = generateAccessToken(user);
 
-    res.cookie("accessToken", newAccessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 15 * 60 * 1000,
-    });
+        const isProduction = process.env.NODE_ENV === "production";
+        res.cookie("accessToken", newAccessToken, {
+          httpOnly: true,
+          secure: isProduction,
+          sameSite: isProduction ? "none" : "lax",
+          maxAge: 15 * 60 * 1000,
+        });
 
     return res.status(200).json({
       success: true,
