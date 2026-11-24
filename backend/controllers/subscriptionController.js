@@ -16,6 +16,14 @@ export const knowsubscription = async (req, res) => {
       });
     }
 
+    if (
+      existingsubscription.expiresAt &&
+      existingsubscription.expiresAt <= new Date()
+    ) {
+      existingsubscription.status = "expired";
+      await existingsubscription.save();
+    }
+
     return res.status(200).json({
       success: true,
       message: "Found subscription Details.",

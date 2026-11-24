@@ -1,12 +1,14 @@
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import { setUser, clearUser } from "./redux/slices/userSlice.js";
 import { setSubscription, clearSubscription } from "./redux/slices/Subcription.js";
 import { setTheme } from "./redux/slices/themeSlice.js";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import Login from "./components/comman/Login.jsx";
+import Loading from "./components/comman/Loading.jsx";
+import SubscriptionExpired from "./components/comman/SubscriptionExpired.jsx";
 import Subscription from "./components/comman/Subscription.jsx";
 import HomePage from "./components/Home/HomePage.jsx";
 import SavedServicesPage from "./components/Home/SavedServicesPage.jsx";
@@ -17,6 +19,8 @@ import Error404 from "./components/Home/Error404.jsx";
 function App() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
+  const [appLoading, setAppLoading] = useState(true);
   const theme = useSelector((state) => state.theme.theme);
 
   // Keep the <html> element's "dark" class in sync with Redux theme state.
@@ -24,6 +28,8 @@ function App() {
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
   }, [theme]);
+
+  
 
   // Only auto-follow the OS theme if the user hasn't picked one manually.
   function setupTheme() {
@@ -45,6 +51,7 @@ function App() {
     return () => query.removeEventListener("change", listener);
   }
 
+
   async function knowSbcription() {
     try {
       const response = await fetch(
@@ -57,27 +64,36 @@ function App() {
 
       const data = await response.json();
 
-      // User has no subscription yet
+      // User has no subscription
       if (response.status === 409) {
         dispatch(clearSubscription());
-
-        // Send them to subscription page
-        navigate("/subscription");
-
+        navigate("/subscription", { replace: true });
         return;
       }
 
-      // Other errors
       if (!response.ok) {
-        console.log("Failed to fetch subscription details:", data);
-        return;
+        throw new Error(data.message || "Failed to fetch subscription");
       }
 
-      // User has an active subscription
-      dispatch(setSubscription(data.subscription));
+      const subscription = data.subscription;
+
+      dispatch(setSubscription(subscription));
+
+      // Check whether subscription has expired
+      const isExpired =
+        subscription.status === "expired" ||
+        (subscription.expiresAt &&
+          new Date(subscription.expiresAt) <= new Date());
+
+      if (
+        isExpired &&
+        location.pathname !== "/subscription"
+      ) {
+        navigate("/subscription-expired", { replace: true });
+      }
 
     } catch (error) {
-      console.log("Failed to fetch subscription details.", error);
+      console.error("Failed to fetch subscription details:", error);
     }
   }
 
@@ -141,13 +157,15 @@ function App() {
     const cleanupTheme = setupTheme();
 
     (async () => {
-      const isAuthenticated = await checkAuth();
+      try {
+        const isAuthenticated = await checkAuth();
 
-      if (!isAuthenticated) {
-        return;
+        if (isAuthenticated) {
+          await knowSbcription();
+        }
+      } finally {
+        setAppLoading(false);
       }
-
-      await knowSbcription();
     })();
 
     return () => {
@@ -156,10 +174,21 @@ function App() {
       }
     };
   }, [dispatch, navigate]);
+
+  if (appLoading) {
+    return (
+      <Loading
+        text="Checking your account..."
+        subtext="Please wait while we verify your subscription"
+      />
+    );
+  }
+  
   return (
     <Routes>
       <Route path="/register" element={<Login />} />
       <Route path="/subscription" element={<Subscription />} />
+      <Route path="/subscription-expired" element={<SubscriptionExpired />} />
       <Route path="/" element={<HomePage />} />
       <Route path="/SavedServices" element={<SavedServicesPage />} />
       <Route path="/AboutUs" element={<AboutUsPage />} />

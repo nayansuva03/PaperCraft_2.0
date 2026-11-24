@@ -5,6 +5,8 @@ const initialState = {
   plan: "",
   tokens: null,
   savedServicesLimit: null,
+  expiresAt: null,
+  status: "",
 };
 
 const subscriptionSlice = createSlice({
@@ -34,6 +36,9 @@ const subscriptionSlice = createSlice({
       state.plan = action.payload.plan ?? "";
       state.tokens = action.payload.tokens ?? null;
       state.savedServicesLimit = action.payload.savedServicesLimit ?? null;
+
+      state.expiresAt = action.payload.expiresAt ?? null;
+      state.status = action.payload.status ?? "";
     },
 
     clearSubscription: (state) => {
@@ -41,6 +46,8 @@ const subscriptionSlice = createSlice({
       state.plan = "";
       state.tokens = null;
       state.savedServicesLimit = null;
+      state.expiresAt = null;
+      state.status = "";
     },
   },
 });

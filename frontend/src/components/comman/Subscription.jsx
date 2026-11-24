@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import { Check, X, ShieldCheck } from 'lucide-react';
 import { useNavigate } from "react-router-dom"
+import Loading from "./Loading";
 
 export default function Subscription() {
 
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
 
     const plans = [
         {
@@ -42,13 +45,13 @@ export default function Subscription() {
     ];
 
     const freeTryel = async () => {
+        if (loading) return;          // ignore double clicks
+        setLoading(true);
         try {
             const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/subscription/free-trial`, {
                 method: "POST",
                 credentials: "include",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
             });
 
             const data = await response.json();
@@ -58,18 +61,22 @@ export default function Subscription() {
                 return;
             }
 
-            navigate("/")
-
+            navigate("/");
         } catch (error) {
-            console.log("Error Fetching the free trial api.",error);
-            
+            console.log("Error Fetching the free trial api.", error);
+        } finally {
+            setLoading(false);        // runs on success, error and early return
         }
-        
-    }
-    
+    };
 
     return (
         <div className="min-h-screen bg-slate-50 text-slate-900 py-16 px-4 sm:px-6 lg:px-8 flex flex-col justify-between">
+            {loading && (
+                <Loading
+                    text="Activating your free trial..."
+                    subtext="This will only take a moment"
+                />
+            )}
             <div className="max-w-7xl mx-auto w-full">
                 {/* Header */}
                 <div className="text-center max-w-3xl mx-auto mb-16">
