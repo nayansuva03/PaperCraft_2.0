@@ -8,8 +8,8 @@ export default function Subscription() {
     const plans = [
         {
             name: 'Basic',
-            price: '₹99',
-            validity: '30 days',
+            price: '₹1',
+            validity: '2 days',
             popular: false,
             features: [
                 { label: '60 Tokens', included: true },
@@ -19,8 +19,8 @@ export default function Subscription() {
         },
         {
             name: 'Pro',
-            price: '₹199',
-            validity: '30 days',
+            price: '₹2',
+            validity: '2 days',
             popular: true,
             features: [
                 { label: '150 Tokens', included: true },
@@ -30,8 +30,8 @@ export default function Subscription() {
         },
         {
             name: 'Ultra',
-            price: '₹299',
-            validity: '30 days',
+            price: '₹3',
+            validity: '3 days',
             popular: false,
             features: [
                 { label: '250 Tokens', included: true },

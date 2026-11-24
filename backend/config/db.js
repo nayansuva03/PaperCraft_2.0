@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(`${process.env.MONGODB_URL}/PaperCraft-2_0`);
+    await mongoose.connect(`${process.env.MONGODB_URL}PaperCraft2`);
 
     console.log("✅ MongoDB Connected");
   } catch (error) {

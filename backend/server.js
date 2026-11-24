@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import subscriptionRoutes from "./routes/subscriptionRoutes.js";
+import savedServicesRoutes from "./routes/SavedServicesRoutes.js";
 
 dotenv.config();
 
@@ -25,6 +26,9 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/subscription", subscriptionRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/subscription", subscriptionRoutes);
+app.use("/api", savedServicesRoutes);
 
 app.get("/", (req, res) => {
   res.send("Server running...");

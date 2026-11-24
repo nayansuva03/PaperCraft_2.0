@@ -9,7 +9,11 @@ import {
     Tag,
     Lock,
     FolderOpen,
-    Loader2
+    Loader2,
+    AlertTriangle,
+    RefreshCw,
+    Home,
+    Sparkles
 } from "lucide-react";
 import PageLayout from "../comman/PageLayout";
 
@@ -18,9 +22,12 @@ function SavedServices() {
     const navigate = useNavigate();
 
     const [pdfs, setPdfs] = useState([]);
-    const [loading, setLoading] = useState(false);
+    // Start as true so the empty view doesn't flash before the first fetch begins
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [deletingId, setDeletingId] = useState(null);
+    // Incrementing this re-runs the fetch effect (used by the "Try again" button)
+    const [reloadKey, setReloadKey] = useState(0);
 
     useEffect(() => {
         if (!isLoggedIn) return;
@@ -38,13 +45,31 @@ function SavedServices() {
                     }
                 );
 
-                const data = await response.json();
+                // Read the response safely. Some error responses may not contain JSON.
+                const data = await response.json().catch(() => ({}));
 
                 if (!response.ok) {
-                    throw new Error(data.message || "Failed to fetch saved PDFs");
+                    // The backend should use this code when the user's saved-services
+                    // document does not exist yet (no services have been saved).
+                    const isNoSavedServices =
+                        data.code === "SAVED_SERVICES_NOT_FOUND" ||
+                        (response.status === 404 &&
+                            /saved.?services?.?(document)?.?(not found|does not exist)|no saved services/i.test(
+                                data.message || ""
+                            ));
+
+                    if (isNoSavedServices) {
+                        // Not an error: show the empty view instead
+                        setPdfs([]);
+                        return;
+                    }
+
+                    // Any unrelated error is shown as returned by the backend.
+                    throw new Error(data.message || `Failed to fetch saved PDFs (${response.status})`);
                 }
-                
-                setPdfs(data);
+
+                // An empty array is the normal response when the user has no saved PDFs.
+                setPdfs(Array.isArray(data) ? data : []);
             } catch (error) {
                 console.error(error);
                 setError(error.message);
@@ -54,7 +79,7 @@ function SavedServices() {
         }
 
         fetchSavedPdfs();
-    }, [isLoggedIn]);
+    }, [isLoggedIn, reloadKey]);
 
     async function handleDelete(id) {
         try {
@@ -67,7 +92,7 @@ function SavedServices() {
                 }
             );
 
-            const data = await response.json();
+            const data = await response.json().catch(() => ({}));
 
             if (!response.ok) {
                 throw new Error(data.message || "Failed to delete PDF");
@@ -124,8 +149,40 @@ function SavedServices() {
         return (
             <PageLayout>
                 <div className="flex-1 flex items-center justify-center p-6">
-                    <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 px-6 py-4 rounded-xl max-w-md text-center">
-                        <p className="font-medium">{error}</p>
+                    <div className="relative max-w-md w-full overflow-hidden bg-white dark:bg-[#121829] border border-red-200 dark:border-red-500/20 rounded-2xl p-8 text-center shadow-xl">
+                        {/* soft red glow */}
+                        <div className="pointer-events-none absolute -top-16 left-1/2 -translate-x-1/2 w-56 h-56 bg-red-500/10 dark:bg-red-500/15 rounded-full blur-3xl" />
+
+                        <div className="relative">
+                            <div className="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-5 border border-red-500/20">
+                                <AlertTriangle className="w-8 h-8 text-red-600 dark:text-red-400" />
+                            </div>
+
+                            <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+                                Something went wrong
+                            </h2>
+
+                            <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-6 break-words">
+                                {error}
+                            </p>
+
+                            <div className="flex flex-col sm:flex-row gap-3">
+                                <button
+                                    onClick={() => setReloadKey((k) => k + 1)}
+                                    className="flex-1 inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium py-2.5 rounded-xl transition duration-200"
+                                >
+                                    <RefreshCw className="w-4 h-4" />
+                                    Try again
+                                </button>
+                                <button
+                                    onClick={() => navigate("/")}
+                                    className="flex-1 inline-flex items-center justify-center gap-2 bg-slate-100 dark:bg-slate-800/60 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-medium py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/50 transition duration-200"
+                                >
+                                    <Home className="w-4 h-4" />
+                                    Go home
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </PageLayout>
@@ -136,13 +193,34 @@ function SavedServices() {
     if (pdfs.length === 0) {
         return (
             <PageLayout>
-                <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800/50 rounded-2xl flex items-center justify-center mx-auto mb-5 border border-slate-200 dark:border-slate-700/50">
-                    <FolderOpen className="w-8 h-8 text-slate-500 dark:text-slate-400" />
+                <div className="flex-1 flex items-center justify-center p-6">
+                    <div className="relative max-w-md w-full overflow-hidden bg-white dark:bg-[#121829] border border-slate-200 dark:border-slate-800 rounded-2xl p-8 text-center shadow-xl">
+                        {/* soft indigo glow */}
+                        <div className="pointer-events-none absolute -top-16 left-1/2 -translate-x-1/2 w-56 h-56 bg-indigo-500/10 dark:bg-indigo-500/15 rounded-full blur-3xl" />
+
+                        <div className="relative">
+                            <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800/50 rounded-2xl flex items-center justify-center mx-auto mb-5 border border-dashed border-slate-300 dark:border-slate-600">
+                                <FolderOpen className="w-8 h-8 text-slate-500 dark:text-slate-400" />
+                            </div>
+
+                            <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+                                No saved PDFs yet
+                            </h2>
+
+                            <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
+                                Generate a Max Question paper, Exam Paper, or Quiz Result and save it. It will show up here.
+                            </p>
+
+                            <button
+                                onClick={() => navigate("/")}
+                                className="w-full inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium py-2.5 rounded-xl transition duration-200"
+                            >
+                                <Sparkles className="w-4 h-4" />
+                                Create your first service
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <h2 className="text-xl font-bold mb-2">No saved PDFs yet</h2>
-                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
-                    Generate a Max Question paper, Exam Paper, or Quiz Result and it will appear here.
-                </p>
             </PageLayout>
         );
     }
