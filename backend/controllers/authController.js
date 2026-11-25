@@ -176,7 +176,7 @@ export const verifySignupOTP = async (req, res) => {
     const hashedPassword = await bcrypt.hash(formData.password, 10);
     const newUser = await User.create({
       firstName: formData.firstName,
-      lastName: (formData.lastName || ""),
+      lastName: formData.lastName || "",
       email: formData.email,
       password: hashedPassword,
       isVerified: true,
@@ -235,6 +235,16 @@ export const login = async (req, res) => {
       return res.status(401).json({
         success: false,
         message: "Invalid email or password.",
+      });
+    }
+
+    // Google-only accounts have no password yet (can be added later from the
+    // Advance Options page). Without this guard bcrypt.compare throws a 500.
+    if (!existingUser.password) {
+      return res.status(401).json({
+        success: false,
+        message:
+          "This account was created with Google. Please sign in with Google.",
       });
     }
 
@@ -600,13 +610,13 @@ export const refreshAccessToken = async (req, res) => {
 
     const newAccessToken = generateAccessToken(user);
 
-        const isProduction = process.env.NODE_ENV === "production";
-        res.cookie("accessToken", newAccessToken, {
-          httpOnly: true,
-          secure: isProduction,
-          sameSite: isProduction ? "none" : "lax",
-          maxAge: 15 * 60 * 1000,
-        });
+    const isProduction = process.env.NODE_ENV === "production";
+    res.cookie("accessToken", newAccessToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      maxAge: 15 * 60 * 1000,
+    });
 
     return res.status(200).json({
       success: true,
@@ -671,21 +681,31 @@ export const googleLogin = async (req, res) => {
       });
 
       if (emailUser) {
-        return res.status(409).json({
-          success: false,
-          message:
-            "An account with this email already exists. Please log in with your password.",
+        // Safety net: this email is already linked to a different Google account.
+        if (emailUser.googleId && emailUser.googleId !== googleId) {
+          return res.status(409).json({
+            success: false,
+            message:
+              "This email is already linked to a different Google account.",
+          });
+        }
+
+        // Same email, verified by Google (email_verified checked above) and
+        // already verified by OTP at signup -> safe to link. The password is
+        // left untouched, so the user can now log in with either method.
+        emailUser.googleId = googleId;
+        await emailUser.save();
+        existingUser = emailUser;
+      } else {
+        // Brand new user -> create Google user
+        existingUser = await User.create({
+          firstName: given_name || "",
+          lastName: family_name || "",
+          email: normalizedEmail,
+          authProvider: "google",
+          googleId,
         });
       }
-
-      // Create Google user
-      existingUser = await User.create({
-        firstName: given_name || "",
-        lastName: family_name || "",
-        email: normalizedEmail,
-        authProvider: "google",
-        googleId,
-      });
     }
 
     // Generate PaperCraft tokens
@@ -693,6 +713,10 @@ export const googleLogin = async (req, res) => {
     const refreshToken = generateRefreshToken(existingUser);
 
     const refreshTokenHash = hashRefreshToken(refreshToken);
+
+    existingUser.sessions = existingUser.sessions.filter(
+      (s) => s.expiresAt > new Date(),
+    );
 
     existingUser.sessions.push({
       refreshTokenHash,
