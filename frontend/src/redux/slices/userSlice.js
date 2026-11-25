@@ -5,6 +5,8 @@ const initialState = {
   lastName: "",
   email: "",
   authProvider: "",
+  hasPassword: false,
+  hasGoogle: false,
   isRegistered: false,
 };
 
@@ -38,6 +40,8 @@ const userSlice = createSlice({
       state.lastName = action.payload.lastName || "";
       state.email = action.payload.email || "";
       state.authProvider = action.payload.authProvider || "";
+      state.hasPassword = !!action.payload.hasPassword;
+      state.hasGoogle = !!action.payload.hasGoogle;
       state.isRegistered = true;
     },
 
@@ -46,6 +50,8 @@ const userSlice = createSlice({
       state.lastName = "";
       state.email = "";
       state.authProvider = "";
+      state.hasPassword = false;
+      state.hasGoogle = false;
       state.isRegistered = false;
     },
   },
