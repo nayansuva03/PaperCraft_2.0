@@ -49,10 +49,12 @@ export const verifyPayment = async (req, res) => {
     }
 
     // 1. Verify signature
-    const expected = crypto
-      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
-      .digest("hex");
+    
+
+const expected = crypto
+  .createHmac("sha256", process.env.LIVE_RAZORPAY_SECRET)
+  .update(razorpay_order_id + "|" + razorpay_payment_id)
+  .digest("hex");
 
     if (expected !== razorpay_signature) {
       return res
